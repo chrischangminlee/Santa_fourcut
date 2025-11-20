@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>산타네컷 | Santa AI 포토부스</title>
+    <meta
+      name="description"
+      content="Santa AI로 한 번에 완성하는 산타네컷. 사진 업로드 후 산타 무드를 입히고 네컷으로 저장하세요."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&family=Space+Grotesk:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #050913;
+        --bg-accent: #0d1428;
+        --panel: rgba(9, 17, 40, 0.82);
+        --primary: #ff4f64;
+        --primary-dark: #d43a48;
+        --border: rgba(255, 255, 255, 0.08);
+        --soft-white: #fff7f1;
+        --mint: #9bd9ce;
+        --secondary: #f0b90b;
+        --text-muted: rgba(255, 255, 255, 0.7);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Gowun Dodum", sans-serif;
+        color: var(--soft-white);
+        background: radial-gradient(circle at top, #101b38 10%, #050913 65%);
+        min-height: 100vh;
+        padding: 0;
+        line-height: 1.4;
+      }
+
+      .snow-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+            rgba(255, 255, 255, 0.2) 1px,
+            transparent 1px
+          ),
+          radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+        background-size: 120px 120px, 80px 80px;
+        opacity: 0.4;
+        animation: snowfall 18s linear infinite;
+        z-index: 0;
+      }
+
+      @keyframes snowfall {
+        from {
+          transform: translateY(-10px);
+        }
+        to {
+          transform: translateY(10px);
+        }
+      }
+
+      .hero {
+        position: relative;
+        padding: 80px 20px 20px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: clamp(32px, 6vw, 64px);
+        margin-bottom: 16px;
+        font-family: "Jua", cursive;
+        color: var(--primary);
+      }
+
+      .hero p {
+        margin: 0 auto;
+        max-width: 680px;
+        font-size: 1.1rem;
+        color: var(--text-muted);
+      }
+
+      .hero-linkedin {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+      }
+
+      .hero-actions {
+        margin-top: 32px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: none;
+        cursor: pointer;
+        border-radius: 28px;
+        font-size: 1rem;
+        padding: 14px 28px;
+        font-weight: 600;
+        color: var(--soft-white);
+        background: linear-gradient(120deg, var(--primary), #ff8a7a);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 25px rgba(255, 79, 100, 0.35);
+      }
+
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 30px rgba(255, 79, 100, 0.4);
+      }
+
+      .btn--ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: none;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(18px);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.5rem;
+      }
+
+      .panel p {
+        margin: 0;
+        color: var(--text-muted);
+      }
+
+      .step-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .upload-panel {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        align-items: start;
+      }
+
+      .dropzone {
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+        padding: 32px;
+        text-align: center;
+        transition: border-color 0.3s ease, transform 0.2s ease;
+        background: rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+      }
+
+      .dropzone:hover,
+      .dropzone.is-dragover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+      }
+
+      .dropzone-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      .dropzone small {
+        display: block;
+        color: var(--text-muted);
+        margin-top: 8px;
+      }
+
+      .preview-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .preview-card {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        width: 140px;
+        aspect-ratio: 3 / 4;
+      }
+
+      .preview-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .preview-card button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        border: none;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+      }
+
+      .control-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .control-row label {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        color: var(--text-muted);
+      }
+
+      .prompt-area textarea {
+        width: 100%;
+        min-height: 90px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--soft-white);
+        resize: vertical;
+      }
+
+      .api-inputs {
+        display: grid;
+        gap: 14px;
+      }
+
+      .api-inputs input {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--soft-white);
+      }
+
+      .provider-card {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 16px;
+        margin-top: 12px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .status {
+        min-height: 24px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .status--success {
+        color: #8ddfa4;
+      }
+
+      .status--error {
+        color: #ffb4c0;
+      }
+
+      .result-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .strip-preview {
+        min-height: 240px;
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 24px;
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+      }
+
+      .strip {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px 26px 26px;
+        border-radius: 28px;
+        background: #fff7f1;
+        border: 4px solid #f4d9cf;
+        width: min(720px, 100%);
+      }
+
+      .strip-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 12px 18px;
+        border-radius: 18px;
+        border: 2px dashed rgba(255, 79, 100, 0.25);
+        background: rgba(255, 255, 255, 0.7);
+        position: relative;
+      }
+
+      .strip-ig {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #da3d4a;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .strip-logo {
+        font-family: "Jua", sans-serif;
+        font-size: 1.6rem;
+        color: #111;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .strip-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .strip-frame {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        aspect-ratio: 3 / 4;
+        border: 4px solid #f2d6cf;
+        width: 100%;
+      }
+
+      .strip-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      footer {
+        text-align: center;
+        padding: 40px 0 60px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .tips-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .tips-list li {
+        list-style: none;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .pose-list {
+        margin: 0 0 20px 0;
+        padding-left: 22px;
+        color: var(--text-muted);
+      }
+
+      .pose-list li {
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 768px) {
+        .panel {
+          padding: 22px;
+        }
+
+        .strip {
+          width: 100%;
+          padding: 18px;
+        }
+
+        .strip-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .strip-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          position: static;
+        }
+
+        .strip-ig {
+          position: static;
+          transform: none;
+        }
+
+        .hero-linkedin {
+          position: static;
+          display: inline-flex;
+          margin: 0 auto 16px;
+          order: -1;
+        }
+
+        .hero .step-label {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="snow-layer" aria-hidden="true"></div>
+    <header class="hero">
+      <a
+        class="btn hero-linkedin"
+        href="https://www.linkedin.com/in/chrislee9407/"
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        개발자 링크드인
+      </a>
+      <div class="step-label">AI PHOTOBOOTH</div>
+      <h1>산타네컷 ✶ Santa AI</h1>
+      <p>
+        참조 사진 1장만 업로드하세요. 산타 AI가 네 컷을 만들어 따뜻한 산타
+        스토리를 완성합니다.
+      </p>
+      <div class="hero-actions">
+        <button class="btn" id="hero-upload">사진 올리기</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel upload-panel">
+        <div>
+          <div class="step-label">STEP 1</div>
+          <h2>사진 업로드</h2>
+          <p>본인 사진 1장을 업로드하면 이를 바탕으로 모든 포즈를 만듭니다.</p>
+          <div class="dropzone" id="dropzone" role="button" tabindex="0">
+            <input
+              type="file"
+              id="file-input"
+              accept="image/*"
+              multiple
+              hidden
+            />
+            <div class="dropzone-icon">🎅</div>
+            <strong>파일 선택 또는 끌어다 놓기</strong>
+            <small>JPG · PNG · HEIC / 단 1장의 참조 사진만 필요해요</small>
+          </div>
+          <div style="margin-top: 20px">
+            <h3 style="margin: 0 0 10px; font-size: 1rem; color: var(--text-muted)">
+              업로드한 참조 사진
+            </h3>
+            <div class="preview-grid" id="preview-grid">
+              <p
+                style="
+                  flex-basis: 100%;
+                  color: var(--text-muted);
+                  text-align: center;
+                  margin: 0;
+                "
+              >
+                아직 사진이 없어요. 위 영역에 사진을 추가해 주세요.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="step-label">STEP 2</div>
+          <h2>분위기 &amp; 요청</h2>
+          <div class="prompt-area" style="margin-top: 16px">
+            <label for="prompt-input">추가 요청 (선택)</label>
+            <textarea
+              id="prompt-input"
+              placeholder="예: 더 많은 눈송이, 따뜻한 조명, 레트로 톤"
+            ></textarea>
+          </div>
+        </div>
+        <div>
+          <div class="step-label">STEP 3</div>
+          <h2>Gemini Image 연결</h2>
+          <p>Google Gemini 2.5 Flash Image 모델과 연결하여 네 가지 포즈를 생성합니다.</p>
+
+          <div class="provider-card">
+            <div class="api-inputs">
+              <div>
+                <label for="gemini-key">Gemini API 키</label>
+                <input
+                  type="password"
+                  id="gemini-key"
+                  placeholder="Google AI Studio에서 발급받은 키를 입력하세요."
+                  autocomplete="off"
+                />
+              </div>
+              <div>
+                <label for="gemini-model">Gemini 모델</label>
+                <input
+                  type="text"
+                  id="gemini-model"
+                  value="gemini-2.5-flash-image"
+                />
+              </div>
+            </div>
+            <small style="display:block;margin-top:10px;color:var(--text-muted)">
+              참조 사진과 키는 로컬 dev 서버를 거쳐 Google Gemini API로만 전달됩니다.
+            </small>
+          </div>
+
+          <small style="display: block; margin-top: 10px; color: var(--text-muted)"
+            >키는 브라우저에 저장되지 않으며, 새로고침 시 다시 입력해야 합니다.</small
+          >
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="step-label">STEP 4</div>
+        <h2>산타네컷 만들기</h2>
+        <div class="control-row" style="margin: 12px 0 20px">
+          <button class="btn" id="generate-btn" disabled>산타 변환 시작</button>
+          <button class="btn btn--ghost" id="reset-btn">초기화</button>
+        </div>
+        <p style="color: var(--text-muted); margin: 6px 0 18px">
+          참조 사진 1장만으로 아래 네 가지 산타 포즈를 순서대로 만들어 드립니다.
+        </p>
+        <ol class="pose-list">
+          <li>1컷: 입술에 손가락을 윙크</li>
+          <li>2컷: 선물을 포장하며 리스트를 확인하는 장면.</li>
+          <li>3컷: 어깨에 선물 자루를 멘 역동적인 포즈.</li>
+          <li>4컷: 호호호 웃으며 즐거운 분위기를 표현 </li>
+        </ol>
+        <div class="status" id="status">참조 사진을 올리면 준비됩니다.</div>
+      </section>
+
+      <section class="panel result-panel" aria-live="polite">
+        <h2>산타네컷 미리보기</h2>
+        <div class="strip-preview" id="strip-preview">
+          <p style="color: var(--text-muted)">
+            결과가 여기에 표시됩니다. Gemini Image 변환을 실행한 뒤 확인하세요.
+          </p>
+        </div>
+        <div class="result-actions">
+          <button class="btn" id="download-strip" disabled>
+            네컷 이미지 저장
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>작업 팁</h2>
+        <p>더 탄탄한 결과를 위해 아래 팁을 참고해 주세요.</p>
+        <ul class="tips-list" id="tips-list">
+          <li>얼굴이 정면으로 보이면 각 포즈에 착용되는 산타 소품이 더 자연스럽습니다.</li>
+          <li>Gemini API는 입력 프롬프트(추가 요청)를 그대로 전달받으므로 원하는 분위기를 구체적으로 적어주세요.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>© 2025 산타네컷 · powered by Santa AI magic</footer>
+
+    <script>
+      const STRIP_FRAMES = 4;
+      const STRIP_COLUMNS = 2;
+      const STRIP_ROWS = 2;
+      const SANTA_POSES = [
+        {
+          title: "Pose 1",
+          description: "입술에 손가락을 대고 윙크하는 산타",
+        },
+        {
+          title: "Pose 2",
+          description: "선물 리스트를 확인하며 포장하는 산타",
+        },
+        {
+          title: "Pose 3",
+          description: "커다란 선물 자루를 어깨에 멘 역동적인 포즈",
+        },
+        {
+          title: "Pose 4",
+          description: "배를 잡고 호호호 웃는 즐거운 장면",
+        },
+      ];
+      const state = {
+        files: [],
+        processed: [],
+        prompt: "",
+        isProcessing: false,
+      };
+
+      const fileInput = document.getElementById("file-input");
+      const dropzone = document.getElementById("dropzone");
+      const previewGrid = document.getElementById("preview-grid");
+      const generateBtn = document.getElementById("generate-btn");
+      const resetBtn = document.getElementById("reset-btn");
+      const statusEl = document.getElementById("status");
+      const stripPreview = document.getElementById("strip-preview");
+      const downloadBtn = document.getElementById("download-strip");
+      const promptInput = document.getElementById("prompt-input");
+      const geminiKeyInput = document.getElementById("gemini-key");
+      const geminiModelInput = document.getElementById("gemini-model");
+      const heroUpload = document.getElementById("hero-upload");
+      const guideButtons = [];
+
+      heroUpload.addEventListener("click", () => fileInput.click());
+      guideButtons.forEach((btn) =>
+        btn.addEventListener("click", () =>
+          window.alert("샘플 네컷은 곧 업데이트 됩니다. 직접 만들어보세요!")
+        )
+      );
+
+      dropzone.addEventListener("click", () => fileInput.click());
+      dropzone.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          fileInput.click();
+        }
+      });
+
+      fileInput.addEventListener("change", (event) => {
+        handleFiles(event.target.files);
+        fileInput.value = "";
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          dropzone.classList.add("is-dragover");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          dropzone.classList.remove("is-dragover");
+        });
+      });
+
+      dropzone.addEventListener("drop", (event) => {
+        const files = event.dataTransfer?.files;
+        if (files) {
+          handleFiles(files);
+        }
+      });
+
+      promptInput.addEventListener("input", (event) => {
+        state.prompt = event.target.value.trim();
+      });
+
+      generateBtn.addEventListener("click", processImages);
+      downloadBtn.addEventListener("click", downloadStrip);
+      resetBtn.addEventListener("click", resetWorkspace);
+
+      function getMaxInputCount() {
+        return 1;
+      }
+
+      function isReadyForGeneration() {
+        return state.files.length === getMaxInputCount() && state.files.length > 0;
+      }
+
+      function updateGenerateAvailability() {
+        if (state.isProcessing) {
+          generateBtn.disabled = true;
+          return;
+        }
+        generateBtn.disabled = !isReadyForGeneration();
+      }
+
+      function handleFiles(fileList) {
+        const incoming = Array.from(fileList).filter((file) =>
+          file.type.startsWith("image/")
+        );
+        if (!incoming.length) {
+          updateStatus("이미지 파일만 업로드할 수 있습니다.", "error");
+          return;
+        }
+        const maxInputs = getMaxInputCount();
+        const slots = maxInputs - state.files.length;
+        if (slots <= 0) {
+          updateStatus(
+            `현재 모드는 참조 사진 ${maxInputs}장만 허용합니다.`,
+            "error"
+          );
+          return;
+        }
+
+        const accepted = incoming.slice(0, slots);
+        accepted.forEach((file) => {
+          const url = URL.createObjectURL(file);
+          state.files.push({ file, url });
+        });
+
+        renderPreviewGrid();
+        updateStripPreview();
+        const readyMsg =
+          state.files.length === maxInputs
+            ? "모든 참조 사진이 준비됐어요."
+            : `${state.files.length}/${maxInputs}장 업로드됨`;
+        if (incoming.length > accepted.length) {
+          const skipped = incoming.length - accepted.length;
+          updateStatus(
+            `${readyMsg} · ${skipped}장은 제한을 초과해 제외됐습니다.`,
+            "info"
+          );
+        } else {
+          updateStatus(readyMsg, "success");
+        }
+        updateGenerateAvailability();
+      }
+
+      function renderPreviewGrid() {
+        previewGrid.innerHTML = "";
+        const required = getMaxInputCount();
+        if (!state.files.length) {
+          previewGrid.innerHTML =
+            `<p style="flex-basis:100%;text-align:center;color:var(--text-muted);margin:0;">참조 사진을 ${required}장 올려주세요.</p>`;
+          updateGenerateAvailability();
+          return;
+        }
+
+        state.files.forEach((entry, index) => {
+          const card = document.createElement("div");
+          card.className = "preview-card";
+
+          const img = document.createElement("img");
+          img.src = entry.url;
+          img.alt = `업로드된 사진 ${index + 1}`;
+          card.appendChild(img);
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.setAttribute("aria-label", "사진 제거");
+          removeBtn.textContent = "✕";
+          removeBtn.addEventListener("click", () => removeFile(index));
+          card.appendChild(removeBtn);
+
+          previewGrid.appendChild(card);
+        });
+
+        if (state.files.length < required) {
+          const reminder = document.createElement("p");
+          reminder.style.flexBasis = "100%";
+          reminder.style.color = "var(--text-muted)";
+          reminder.style.textAlign = "center";
+          reminder.style.margin = "0";
+          reminder.textContent = `현재 ${state.files.length}/${required}장입니다. 나머지도 추가해 주세요.`;
+          previewGrid.appendChild(reminder);
+        }
+        updateGenerateAvailability();
+      }
+
+      function removeFile(index) {
+        const [removed] = state.files.splice(index, 1);
+        if (removed) {
+          URL.revokeObjectURL(removed.url);
+        }
+        renderPreviewGrid();
+        updateStripPreview();
+        updateGenerateAvailability();
+        updateStatus("사진을 제거했습니다.", "info");
+      }
+
+      async function processImages() {
+        const required = getMaxInputCount();
+        if (state.files.length !== required) {
+          updateStatus(
+            `참조 사진 ${required}장을 모두 업로드한 뒤 다시 시도해주세요.`,
+            "error"
+          );
+          return;
+        }
+
+        const geminiKey = geminiKeyInput.value.trim();
+        const geminiModel =
+          geminiModelInput.value.trim() || "gemini-2.5-flash-image";
+        const prompt = state.prompt;
+
+        if (!geminiKey) {
+          updateStatus("Gemini Image 모드를 사용하려면 API 키가 필요합니다.", "error");
+          return;
+        }
+
+        setLoading(true);
+        disposeProcessed();
+        updateStripPreview();
+        updateStatus("산타 변환을 준비 중...", "info");
+
+        const tasks = Array.from({ length: STRIP_FRAMES }, (_, poseIndex) => ({
+          entry: state.files[poseIndex % state.files.length],
+          poseIndex,
+        }));
+
+        for (const [index, task] of tasks.entries()) {
+          const entry = task.entry;
+          try {
+            const posePrompt = buildPosePrompt(task.poseIndex, prompt);
+            const blob = await callGeminiImage(entry.file, {
+              apiKey: geminiKey,
+              model: geminiModel,
+              prompt: posePrompt,
+            });
+            const url = URL.createObjectURL(blob);
+            state.processed.push({
+              blob,
+              url,
+              name: `santa-${task.poseIndex + 1}.jpg`,
+              poseIndex: task.poseIndex,
+            });
+            updateStatus(
+              `${index + 1}/${tasks.length} 장 처리 완료`,
+              "success"
+            );
+            updateStripPreview();
+          } catch (error) {
+            console.error(error);
+            updateStatus(
+              `Gemini 생성에 실패했습니다: ${error.message}`,
+              "error"
+            );
+            break;
+          }
+        }
+
+        downloadBtn.disabled = state.processed.length < STRIP_FRAMES;
+        setLoading(false);
+      }
+
+      function getFramesForPreview() {
+        return state.processed;
+      }
+
+      function buildPosePrompt(poseIndex, extraPrompt) {
+        const pose = SANTA_POSES[poseIndex];
+        const segments = [];
+        if (pose) {
+          segments.push(
+            `Create a photo of this person cosplay in well-fit santa costume, very attractive and no beard for the pose "${pose.title}" (${pose.description}).`
+          );
+        } else {
+          segments.push("Create a Santa portrait.");
+        }
+        segments.push(
+          "Preserve the face and body identity and from the reference photo."
+        );
+        segments.push("Keep it focused on this single person.");
+        segments.push("Use warm studio lighting, and gentle snowfall.");
+        if (extraPrompt) {
+          segments.push(`Extra direction: ${extraPrompt}`);
+        }
+        return segments.join(" ");
+      }
+
+      function updateStripPreview() {
+        const frames = getFramesForPreview();
+        stripPreview.innerHTML = "";
+
+        if (frames.length < STRIP_FRAMES) {
+          stripPreview.innerHTML =
+            '<p style="color:var(--text-muted)">Gemini로 네 가지 산타 포즈를 모두 생성하면 미리보기가 표시됩니다.</p>';
+          return;
+        }
+
+        const normalized = getNormalizedFrames(frames);
+        const strip = document.createElement("div");
+        strip.className = "strip";
+
+        const header = document.createElement("div");
+        header.className = "strip-header";
+
+        const igBadge = document.createElement("div");
+        igBadge.className = "strip-ig";
+        igBadge.textContent = "📸 @changmini.ai";
+
+        const logo = document.createElement("div");
+        logo.className = "strip-logo";
+        logo.textContent = "산타네컷";
+
+        header.appendChild(igBadge);
+        header.appendChild(logo);
+        strip.appendChild(header);
+
+        const grid = document.createElement("div");
+        grid.className = "strip-grid";
+
+        normalized.forEach((frame, index) => {
+          const frameEl = document.createElement("div");
+          frameEl.className = "strip-frame";
+
+          const img = document.createElement("img");
+          img.src = frame.url;
+          img.alt = `네컷 ${index + 1}번째`;
+          frameEl.appendChild(img);
+
+          grid.appendChild(frameEl);
+        });
+
+        strip.appendChild(grid);
+        stripPreview.appendChild(strip);
+      }
+
+      function getNormalizedFrames(frames) {
+        if (!frames.length) return [];
+        return Array.from(
+          { length: Math.max(STRIP_FRAMES, frames.length) },
+          (_, idx) => {
+            const source = frames[idx % frames.length];
+            if (!source) return null;
+            if (typeof source.poseIndex === "number") {
+              return source;
+            }
+            return { ...source, poseIndex: idx };
+          }
+        )
+          .filter(Boolean)
+          .slice(0, STRIP_FRAMES);
+      }
+
+      async function downloadStrip() {
+        const canvas = await buildStripCanvas();
+        if (!canvas) {
+          updateStatus("아직 완료된 결과가 없습니다. 변환을 모두 마친 뒤 다시 시도해주세요.", "error");
+          return;
+        }
+
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "santa-4cut.png";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+          updateStatus("네컷 이미지를 저장했습니다!", "success");
+        }, "image/png");
+      }
+
+      async function buildStripCanvas() {
+        const frames = getFramesForPreview();
+        if (frames.length < STRIP_FRAMES) return null;
+        const normalized = getNormalizedFrames(frames);
+
+        const frameWidth = 720;
+        const frameHeight = 960;
+        const gutter = 40;
+        const headerHeight = 150;
+        const columns = STRIP_COLUMNS;
+        const rows = STRIP_ROWS;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = frameWidth * columns + gutter * (columns + 1);
+        canvas.height =
+          headerHeight + gutter * 3 + frameHeight * rows + gutter * (rows - 1);
+
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#fff5f1";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawStripHeaderCanvas(ctx, {
+          x: gutter,
+          y: gutter,
+          width: canvas.width - gutter * 2,
+          height: headerHeight,
+        });
+
+        for (const [index, frame] of normalized.entries()) {
+          const img = await blobToImage(frame.blob || frame.file);
+          const row = Math.floor(index / columns);
+          const col = index % columns;
+          const x = gutter + col * (frameWidth + gutter);
+          const y = headerHeight + gutter * 2 + row * (frameHeight + gutter);
+          drawRoundedImage(ctx, img, x, y, frameWidth, frameHeight, 40);
+          addOverlay(ctx, x, y, frameWidth, frameHeight);
+          addSnowParticles(ctx, x, y, frameWidth, frameHeight);
+        }
+
+        return canvas;
+      }
+
+      function drawStripHeaderCanvas(ctx, rect) {
+        const { x, y, width, height } = rect;
+        ctx.save();
+        roundRect(ctx, x, y, width, height, 40);
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "#f2d6cf";
+        ctx.stroke();
+
+        // Instagram badge (top-left)
+        const igCenterX = x + 50;
+        const igCenterY = y + height / 2;
+        ctx.fillStyle = "#ff4f64";
+        ctx.beginPath();
+        ctx.arc(igCenterX, igCenterY, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 28px 'Space Grotesk', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("IG", igCenterX, igCenterY + 1);
+
+        ctx.fillStyle = "#da3d4a";
+        ctx.font = "600 36px 'Space Grotesk', sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText("@changmini.ai", igCenterX + 40, igCenterY);
+
+        // Logo centered
+        ctx.fillStyle = "#111";
+        ctx.font = "bold 72px 'Jua', 'Space Grotesk', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("산타네컷", x + width / 2, y + height / 2 + 12);
+        ctx.restore();
+      }
+
+      function drawRoundedImage(ctx, img, x, y, width, height, radius) {
+        ctx.save();
+        roundRect(ctx, x, y, width, height, radius);
+        ctx.clip();
+
+        const { offsetX, offsetY, drawWidth, drawHeight } = contain(
+          img.width,
+          img.height,
+          width,
+          height
+        );
+        ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+        ctx.restore();
+      }
+
+      function roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+
+      function contain(srcWidth, srcHeight, maxWidth, maxHeight) {
+        const ratio = Math.max(maxWidth / srcWidth, maxHeight / srcHeight);
+        const drawWidth = srcWidth * ratio;
+        const drawHeight = srcHeight * ratio;
+        return {
+          drawWidth,
+          drawHeight,
+          offsetX: (maxWidth - drawWidth) / 2,
+          offsetY: (maxHeight - drawHeight) / 2,
+        };
+      }
+
+      function addOverlay(ctx, x, y, width, height) {
+        ctx.save();
+        roundRect(ctx, x, y, width, height, 40);
+        ctx.clip();
+        const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+        gradient.addColorStop(0, `rgba(255, 79, 100, 0.2)`);
+        gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, width, height);
+        ctx.restore();
+      }
+
+      function addSnowParticles(ctx, x, y, width, height) {
+        const flakes = 40;
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        for (let i = 0; i < flakes; i++) {
+          const size = Math.random() * 6 + 1;
+          const fx = x + Math.random() * width;
+          const fy = y + Math.random() * height;
+          ctx.beginPath();
+          ctx.arc(fx, fy, size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      async function callGeminiImage(file, config) {
+        const base64 = await blobToBase64(file);
+        const response = await fetch("/api/gemini", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: config.prompt,
+            model: config.model,
+            apiKey: config.apiKey,
+            image: {
+              name: file.name,
+              type: file.type || "image/jpeg",
+              data: base64,
+            },
+          }),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const details = payload.text ? ` (${payload.text})` : "";
+          throw new Error((payload.error || "Gemini API 오류") + details);
+        }
+        const image = payload.image;
+        if (!image?.data) {
+          throw new Error("Gemini 응답에 이미지가 포함되어 있지 않습니다.");
+        }
+        return base64ToBlob(
+          image.data,
+          image.mimeType || image.mime_type || "image/png"
+        );
+      }
+
+      function blobToImage(blob) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(blob);
+          const image = new Image();
+          image.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(image);
+          };
+          image.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("이미지를 읽을 수 없습니다."));
+          };
+          image.src = url;
+        });
+      }
+
+      function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result;
+            if (typeof result === "string") {
+              const comma = result.indexOf(",");
+              resolve(comma >= 0 ? result.slice(comma + 1) : result);
+            } else {
+              reject(new Error("이미지를 인코딩하지 못했습니다."));
+            }
+          };
+          reader.onerror = () => reject(new Error("이미지를 인코딩하지 못했습니다."));
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      function base64ToBlob(base64, mimeType) {
+        const binary = atob(base64);
+        const len = binary.length;
+        const buffer = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          buffer[i] = binary.charCodeAt(i);
+        }
+        return new Blob([buffer], { type: mimeType });
+      }
+
+      function updateStatus(message, type = "info") {
+        statusEl.textContent = message;
+        statusEl.className = `status${
+          type === "success"
+            ? " status--success"
+            : type === "error"
+            ? " status--error"
+            : ""
+        }`;
+      }
+
+      function setLoading(isLoading) {
+        state.isProcessing = isLoading;
+        updateGenerateAvailability();
+        generateBtn.textContent = isLoading ? "변환 중..." : "산타 변환 시작";
+      }
+
+      function disposeProcessed() {
+        state.processed.forEach((item) => URL.revokeObjectURL(item.url));
+        state.processed = [];
+      }
+
+      function resetWorkspace() {
+        state.files.forEach((item) => URL.revokeObjectURL(item.url));
+        state.files = [];
+        disposeProcessed();
+        previewGrid.innerHTML =
+          '<p style="flex-basis:100%;text-align:center;color:var(--text-muted);margin:0;">사진을 다시 추가해 주세요.</p>';
+        updateStripPreview();
+        downloadBtn.disabled = true;
+        state.isProcessing = false;
+        updateGenerateAvailability();
+        updateStatus("초기화되었습니다. 새로운 사진을 올려주세요.", "info");
+      }
+    </script>
+  </body>
+</html>
