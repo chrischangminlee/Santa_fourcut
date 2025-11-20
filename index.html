@@ -6,10 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>산타네컷 | Santa AI 포토부스</title>
+    <title>산타윙크 | Santa AI 포토부스</title>
     <meta
       name="description"
-      content="Santa AI로 한 번에 완성하는 산타네컷. 사진 업로드 후 산타 무드를 입히고 네컷으로 저장하세요."
+      content="Santa AI로 한 번에 완성하는 산타윙크 네컷. 사진 업로드 후 산타 무드를 입히고 네컷으로 저장하세요."
     />
     <link
       href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&family=Space+Grotesk:wght@400;600&display=swap"
@@ -473,7 +473,7 @@
         개발자 링크드인
       </a>
       <div class="step-label">AI PHOTOBOOTH</div>
-      <h1>산타네컷 ✶ Santa AI</h1>
+      <h1>산타윙크 ✶ Santa AI</h1>
       <p>
         참조 사진 1장만 업로드하세요. 산타 AI가 네 컷을 만들어 따뜻한 산타
         스토리를 완성합니다.
@@ -568,7 +568,7 @@
 
       <section class="panel">
         <div class="step-label">STEP 4</div>
-        <h2>산타네컷 만들기</h2>
+        <h2>산타윙크 만들기</h2>
         <div class="control-row" style="margin: 12px 0 20px">
           <button class="btn" id="generate-btn" disabled>산타 변환 시작</button>
           <button class="btn btn--ghost" id="reset-btn">초기화</button>
@@ -578,9 +578,9 @@
         </p>
         <ol class="pose-list">
           <li>1컷: 입술에 손가락을 윙크</li>
-          <li>2컷: 선물을 포장하며 리스트를 확인하는 장면.</li>
-          <li>3컷: 어깨에 선물 자루를 멘 역동적인 포즈.</li>
-          <li>4컷: 호호호 웃으며 즐거운 분위기를 표현 </li>
+          <li>2컷: 선물을 포장하며 윙크</li>
+          <li>3컷: 어깨에 선물 자루를 메며 윙크</li>
+          <li>4컷: 호호호 웃으며 윙크 </li>
         </ol>
         <div class="status" id="status">참조 사진을 올리면 준비됩니다.</div>
       </section>
@@ -609,7 +609,7 @@
       </section>
     </main>
 
-    <footer>© 2025 산타네컷 · powered by Santa AI magic</footer>
+    <footer>© 2025 산타윙크 · powered by Santa AI magic</footer>
 
     <script>
       const STRIP_FRAMES = 4;
@@ -622,15 +622,15 @@
         },
         {
           title: "Pose 2",
-          description: "선물 리스트를 확인하며 포장하는 산타",
+          description: "선물 패키지를 하며 윙크하는 산타",
         },
         {
           title: "Pose 3",
-          description: "커다란 선물 자루를 어깨에 멘 역동적인 포즈",
+          description: "커다란 선물 자루를 어깨에 메며 윙크",
         },
         {
           title: "Pose 4",
-          description: "배를 잡고 호호호 웃는 즐거운 장면",
+          description: "배를 잡고 호호호 웃으며 윙크",
         },
       ];
       const state = {
@@ -927,7 +927,7 @@
 
         const logo = document.createElement("div");
         logo.className = "strip-logo";
-        logo.textContent = "산타네컷";
+        logo.textContent = "산타윙크";
 
         header.appendChild(igBadge);
         header.appendChild(logo);
@@ -1065,7 +1065,7 @@
         ctx.fillStyle = "#111";
         ctx.font = "bold 72px 'Jua', 'Space Grotesk', sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("산타네컷", x + width / 2, y + height / 2 + 12);
+        ctx.fillText("산타윙크", x + width / 2, y + height / 2 + 12);
         ctx.restore();
       }
 
